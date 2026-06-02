@@ -1,0 +1,10 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: myautospace-frontend
+    container_name: myautospace-frontend
+    ports:
+      - "8080:80"
+    restart: unless-stopped
