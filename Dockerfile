@@ -15,8 +15,11 @@ RUN npm run build
 # ---- serve stage ----
 FROM nginx:alpine AS final
 
-# SPA-aware nginx config (history fallback + asset caching).
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# SPA-aware nginx config (history fallback + asset caching + /api proxy).
+# Placed in /etc/nginx/templates so the entrypoint substitutes ${API_UPSTREAM}
+# at startup — point it at the YARP gateway for the target environment.
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+ENV API_UPSTREAM=http://host.docker.internal:5050
 
 # Ship only the built static assets.
 COPY --from=build /app/dist /usr/share/nginx/html

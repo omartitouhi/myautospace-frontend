@@ -7,4 +7,11 @@ services:
     container_name: myautospace-frontend
     ports:
       - "8080:80"
+    environment:
+      # YARP gateway as seen from inside this container. The default reaches a
+      # gateway published on the Docker host (backend compose maps it to 5050).
+      API_UPSTREAM: http://host.docker.internal:5050
+    extra_hosts:
+      # Make host.docker.internal resolve on Linux engines too.
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped

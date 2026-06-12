@@ -1,51 +1,34 @@
-import { useLayoutEffect } from 'react'
-import { useReveal } from './lib/hooks'
-import { Nav } from './components/Nav'
-import { Hero } from './components/Hero'
-import { Marquee } from './components/Marquee'
-import { Listings } from './components/Listings'
-import { HowItWorks } from './components/HowItWorks'
-import { Features } from './components/Features'
-import { Services } from './components/Services'
-import { Stats } from './components/Stats'
-import { CTA } from './components/CTA'
-import { Footer } from './components/Footer'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { Landing } from './pages/Landing'
+import { Login } from './pages/auth/Login'
+import { Register } from './pages/auth/Register'
+import { AppLayout } from './pages/app/AppLayout'
+import { Browse } from './pages/app/Browse'
+import { VehicleDetail } from './pages/app/VehicleDetail'
+import { Garage } from './pages/app/Garage'
+import { SellForm } from './pages/app/SellForm'
+import { Profile } from './pages/app/Profile'
+import { Notifications } from './pages/app/Notifications'
+import { Welcome } from './pages/app/Welcome'
 
 function App() {
-  // Intro: always make content visible (`shown`); only run the entrance
-  // animation + arm scroll-reveals when the document is actually visible.
-  // A hidden/background tab or reduced-motion never traps content behind an
-  // animation/transition that can't advance. Arm before paint so there's no
-  // visible→hidden flash.
-  useLayoutEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const canAnimate = document.visibilityState === 'visible' && !reduce
-    if (canAnimate) {
-      document.documentElement.classList.add('reveal-armed')
-      document.body.classList.add('animate')
-      const id = requestAnimationFrame(() =>
-        requestAnimationFrame(() => document.body.classList.add('shown')),
-      )
-      return () => cancelAnimationFrame(id)
-    }
-    document.body.classList.add('shown')
-  }, [])
-
-  useReveal()
-
   return (
-    <>
-      <Nav />
-      <Hero />
-      <Marquee />
-      <Listings />
-      <HowItWorks />
-      <Features />
-      <Services />
-      <Stats />
-      <CTA />
-      <Footer />
-    </>
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/app" element={<AppLayout />}>
+        <Route index element={<Browse />} />
+        <Route path="vehicles/:id" element={<VehicleDetail />} />
+        <Route path="garage" element={<Garage />} />
+        <Route path="sell" element={<SellForm />} />
+        <Route path="sell/:id" element={<SellForm />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="welcome" element={<Welcome />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 

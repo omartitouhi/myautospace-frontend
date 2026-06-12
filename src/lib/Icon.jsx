@@ -129,6 +129,75 @@ const I = {
     </g>
   ),
   moon: <path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" />,
+  bell: (
+    <g>
+      <path d="M18 9a6 6 0 10-12 0c0 6-2.5 7.5-2.5 7.5h17S18 15 18 9z" />
+      <path d="M10 20a2.2 2.2 0 004 0" />
+    </g>
+  ),
+  plus: <path d="M12 5v14M5 12h14" />,
+  x: <path d="M6 6l12 12M18 6L6 18" />,
+  chevDown: <path d="M6 9l6 6 6-6" />,
+  pen: <path d="M17 3l4 4L8 20l-5 1 1-5L17 3z" />,
+  trash: (
+    <g>
+      <path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2" />
+      <path d="M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13" />
+      <path d="M10 11v6M14 11v6" />
+    </g>
+  ),
+  logout: (
+    <g>
+      <path d="M15 4H7a2 2 0 00-2 2v12a2 2 0 002 2h8" />
+      <path d="M11 12h10M17 8l4 4-4 4" />
+    </g>
+  ),
+  mail: (
+    <g>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 7l9 6 9-6" />
+    </g>
+  ),
+  phone: (
+    <g>
+      <rect x="7" y="2" width="10" height="20" rx="2" />
+      <path d="M11 18h2" />
+    </g>
+  ),
+  clock: (
+    <g>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 3" />
+    </g>
+  ),
+  refresh: <path d="M21 12a9 9 0 11-2.6-6.4M21 3v5h-5" />,
+  alert: (
+    <g>
+      <path d="M12 3l10 17H2L12 3z" />
+      <path d="M12 10v4M12 17.5v.01" />
+    </g>
+  ),
+  info: (
+    <g>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5M12 8v.01" />
+    </g>
+  ),
+  car: (
+    <g>
+      <path d="M5 11l1.6-4.3A2 2 0 018.5 5.5h7a2 2 0 011.9 1.2L19 11" />
+      <path d="M4 11h16a1 1 0 011 1v4a1 1 0 01-1 1h-1.2M3 17V12a1 1 0 011-1M5.2 17H3" />
+      <circle cx="7.5" cy="16.5" r="1.7" />
+      <circle cx="16.5" cy="16.5" r="1.7" />
+    </g>
+  ),
+  tag: (
+    <g>
+      <path d="M3 11V4a1 1 0 011-1h7l10 10-8 8L3 11z" />
+      <circle cx="8" cy="8" r="1.4" />
+    </g>
+  ),
+  filter: <path d="M3 5h18l-7 8v6l-4 2v-8L3 5z" />,
 }
 
 export function Icon({ name, ...rest }) {

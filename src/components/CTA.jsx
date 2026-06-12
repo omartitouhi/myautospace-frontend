@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useUI } from '../lib/ui'
 import { Icon } from '../lib/Icon'
 
@@ -11,12 +12,12 @@ export function CTA() {
           <h2>{t.cta.title}</h2>
           <p>{t.cta.sub}</p>
           <div className="cta-actions">
-            <a href="#" className="btn btn-primary btn-lg">
+            <Link to="/app" className="btn btn-primary btn-lg">
               {t.cta.primary} <Icon name="arrow" className="arrow" />
-            </a>
-            <a href="#" className="btn btn-ghost btn-lg">
+            </Link>
+            <Link to="/register" className="btn btn-ghost btn-lg">
               {t.cta.secondary}
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useUI } from '../lib/ui'
 import { Icon } from '../lib/Icon'
 
@@ -79,9 +80,9 @@ export function Listings() {
             </div>
             <h2>{t.listings.title}</h2>
           </div>
-          <a href="#" className="btn btn-ghost reveal" style={{ '--i': 1 }}>
+          <Link to="/app" className="btn btn-ghost reveal" style={{ '--i': 1 }}>
             {t.listings.browse} <Icon name="arrow" className="arrow" />
-          </a>
+          </Link>
         </div>
         <div className="listings-grid">
           {LISTINGS.map((d, i) => (
