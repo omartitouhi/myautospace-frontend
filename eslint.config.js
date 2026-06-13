@@ -18,4 +18,12 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    // React Three Fiber is imperative by design — every frame mutates Three.js
+    // objects (camera.position, mesh.rotation, gltf scene transforms). The
+    // React Compiler's immutability rule can't model that and would flag all
+    // of it, so we opt these isolated 3D files out of that one rule.
+    files: ['src/components/hero3d/**/*.{js,jsx}'],
+    rules: { 'react-hooks/immutability': 'off' },
+  },
 ])

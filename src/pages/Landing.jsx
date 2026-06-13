@@ -1,7 +1,7 @@
 import { useLayoutEffect } from 'react'
 import { useReveal } from '../lib/hooks'
 import { Nav } from '../components/Nav'
-import { Hero } from '../components/Hero'
+import { Hero3D } from '../components/Hero3D'
 import { Listings } from '../components/Listings'
 import { HowItWorks } from '../components/HowItWorks'
 import { Features } from '../components/Features'
@@ -35,7 +35,7 @@ export function Landing() {
   return (
     <>
       <Nav />
-      <Hero />
+      <Hero3D />
       <Listings />
       <HowItWorks />
       <Features />

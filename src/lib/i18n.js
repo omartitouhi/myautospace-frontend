@@ -38,6 +38,29 @@ export const translations = {
         { ic: 'star', t: 'Trust Score on every profile' },
       ],
     },
+    hero3d: {
+      kicker: 'The all-in-one vehicle marketplace',
+      title: [{ text: 'One trusted space' }, { pre: 'for your ', em: 'whole drive' }],
+      sub: 'Buy, sell, rent and service vehicles across Tunisia — verified, escrowed and contract-protected.',
+      scrollHint: 'Scroll to explore',
+      transact: {
+        title: 'Buy, sell or rent — your way',
+        items: [
+          { ic: 'tag', t: 'Buy', d: 'Verified listings with Trust Scores and secure escrow.' },
+          { ic: 'car', t: 'Sell', d: 'List in a minute and reach buyers across Tunisia.' },
+          { ic: 'cal', t: 'Rent', d: 'Flexible rentals with protected digital contracts.' },
+        ],
+      },
+      services: {
+        title: 'A certified service network',
+        items: [
+          { ic: 'wrench', t: 'Inspection' },
+          { ic: 'truck', t: 'Transport' },
+          { ic: 'spray', t: 'Detailing' },
+          { ic: 'doc', t: 'Paperwork' },
+        ],
+      },
+    },
     fuel: { electric: 'Electric', petrol: 'Petrol', hybrid: 'Hybrid', diesel: 'Diesel' },
     listings: {
       eyebrow: 'Featured vehicles',
@@ -344,6 +367,29 @@ export const translations = {
         { ic: 'lock', t: 'Séquestre sécurisé' },
         { ic: 'star', t: 'Score de Confiance sur chaque profil' },
       ],
+    },
+    hero3d: {
+      kicker: 'La marketplace tout-en-un pour véhicules',
+      title: [{ text: 'Un espace de confiance' }, { pre: 'pour toute votre ', em: 'mobilité' }],
+      sub: 'Achetez, vendez, louez et entretenez vos véhicules partout en Tunisie — vérifié, sécurisé et sous contrat.',
+      scrollHint: 'Défilez pour explorer',
+      transact: {
+        title: 'Acheter, vendre ou louer — à votre façon',
+        items: [
+          { ic: 'tag', t: 'Acheter', d: 'Annonces vérifiées avec Scores de Confiance et séquestre sécurisé.' },
+          { ic: 'car', t: 'Vendre', d: 'Publiez en une minute et touchez des acheteurs partout en Tunisie.' },
+          { ic: 'cal', t: 'Louer', d: 'Locations flexibles avec contrats numériques protégés.' },
+        ],
+      },
+      services: {
+        title: 'Un réseau de prestataires certifiés',
+        items: [
+          { ic: 'wrench', t: 'Inspection' },
+          { ic: 'truck', t: 'Transport' },
+          { ic: 'spray', t: 'Esthétique' },
+          { ic: 'doc', t: 'Démarches' },
+        ],
+      },
     },
     fuel: { electric: 'Électrique', petrol: 'Essence', hybrid: 'Hybride', diesel: 'Diesel' },
     listings: {
