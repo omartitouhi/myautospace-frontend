@@ -111,13 +111,18 @@ const STATUS_TONES = {
   Sent: 'ok',
   Approved: 'ok',
   Succeeded: 'ok',
+  Confirmed: 'ok',
+  CheckedIn: 'ok',
   Draft: 'neutral',
   Pending: 'warn',
+  Rescheduled: 'warn',
   Sold: 'accent',
   Rented: 'accent',
+  Completed: 'accent',
   Inactive: 'neutral',
   Failed: 'bad',
   Rejected: 'bad',
+  NoShow: 'bad',
   Cancelled: 'neutral',
 }
 

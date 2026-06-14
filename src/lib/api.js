@@ -136,6 +136,31 @@ export const userApi = {
   getTrustScore: () => api('/users/trust-score'),
   recalculateTrustScore: () => api('/users/trust-score/recalculate', { method: 'POST' }),
   getActivity: () => api('/users/activity'),
+
+  // Identity verification (KYC)
+  requestVerification: () => api('/users/verification/request', { method: 'POST' }),
+  getVerificationStatus: () => api('/users/verification/status'),
+
+  // Identity documents — fileUrl since MediaService isn't implemented yet
+  listDocuments: () => api('/users/documents'),
+  addDocument: (body) => api('/users/documents', { method: 'POST', body }),
+  deleteDocument: (id) => api(`/users/documents/${id}`, { method: 'DELETE' }),
+
+  // Subscription packs
+  listPacks: () => api('/users/packs'),
+  currentPack: () => api('/users/packs/current'),
+  subscribePack: (body) => api('/users/packs/subscribe', { method: 'POST', body }),
+  cancelPack: () => api('/users/packs/cancel', { method: 'POST' }),
+
+  // GDPR
+  exportData: () => api('/users/gdpr/export'),
+  deleteAccount: () => api('/users/gdpr/delete-account', { method: 'DELETE' }),
+
+  // Company / dealer accounts
+  listCompanies: () => api('/users/company'),
+  createCompany: (body) => api('/users/company', { method: 'POST', body }),
+  addCompanyMember: (body) => api('/users/company/members', { method: 'POST', body }),
+  removeCompanyMember: (memberId) => api(`/users/company/members/${memberId}`, { method: 'DELETE' }),
 }
 
 /* ---- VehicleService ------------------------------------------------ */
@@ -160,4 +185,21 @@ export const searchApi = {
 export const notificationApi = {
   list: (status) => api(`/notifications${qs({ status })}`),
   attempts: (id) => api(`/notifications/${id}/attempts`),
+}
+
+/* ---- BookingService ------------------------------------------------ */
+export const bookingApi = {
+  create: (body) => api('/bookings', { method: 'POST', body }),
+  listMine: () => api('/bookings/my'),
+  listIncoming: () => api('/bookings/incoming'),
+  get: (id) => api(`/bookings/${id}`),
+  setStatus: (id, status, reason = null) =>
+    api(`/bookings/${id}/status`, { method: 'PATCH', body: { status, reason } }),
+}
+
+export const reminderApi = {
+  list: () => api('/notifications/reminders'),
+  create: (body) => api('/notifications/reminders', { method: 'POST', body }),
+  update: (id, body) => api(`/notifications/reminders/${id}`, { method: 'PUT', body }),
+  remove: (id) => api(`/notifications/reminders/${id}`, { method: 'DELETE' }),
 }

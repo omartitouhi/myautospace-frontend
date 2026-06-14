@@ -1012,3 +1012,92 @@ textarea.input { resize: vertical; min-height: 44px; }
 .hero-dark .nav.scrolled .nav-inner { background: rgba(18, 20, 24, .5); box-shadow: var(--glass-edge), var(--shadow-md); }
 .hero-dark .nav .btn-primary { background: #f0efec; color: #14151a; }
 .hero-dark .nav .btn-primary:hover { background: #fff; }
+
+/* ---- profile: account hub (verification, documents, plans, privacy) ---- */
+.profile-main { display: flex; flex-direction: column; }
+.verify-btn { margin-top: 14px; }
+
+.doc-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.doc-list li { display: flex; align-items: center; gap: 11px; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--glass-border); background: color-mix(in srgb, var(--surface) 40%, transparent); }
+.doc-list li > svg { width: 18px; height: 18px; color: var(--dim); flex: none; }
+.doc-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.doc-main a { font-size: 14px; font-weight: 600; color: var(--accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.doc-main a:hover { text-decoration: underline; }
+.doc-main span { font-size: 12px; color: var(--faint); }
+.icon-btn { width: 30px; height: 30px; flex: none; border: 0; border-radius: 9px; background: transparent; color: var(--faint); display: grid; place-items: center; transition: background .15s, color .15s; }
+.icon-btn:hover { background: color-mix(in srgb, #dc2626 12%, transparent); color: #dc2626; }
+.icon-btn svg { width: 15px; height: 15px; }
+.doc-add { margin-top: 4px; }
+.doc-add-btn { margin-top: 2px; }
+
+.plan-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 4px 0 14px; }
+.plan-opt { padding: 14px 15px; border-radius: 16px; border: 1px solid var(--glass-border); background: color-mix(in srgb, var(--surface) 40%, transparent); transition: border-color .2s, background .2s; }
+.plan-opt[data-on="1"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.plan-opt-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.plan-opt-top b { font-family: var(--font-display); font-size: 16px; }
+.plan-perk { display: block; margin-top: 5px; color: var(--dim); font-size: 12.5px; line-height: 1.45; }
+.plan-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+.privacy-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* ---- reminders ----------------------------------------------------- */
+.reminders-head { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+.reminder-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.reminder { display: flex; align-items: flex-start; gap: 14px; padding: 16px; border-radius: var(--r-md); transition: opacity .2s; }
+.reminder[data-off="1"] { opacity: .55; }
+.reminder-ico { flex: none; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 11%, transparent); color: var(--accent); }
+.reminder-ico svg { width: 19px; height: 19px; }
+.reminder-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.reminder-main b { font-size: 15px; }
+.reminder-msg { color: var(--dim); font-size: 13.5px; line-height: 1.45; }
+.reminder-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; margin-top: 4px; font-size: 12.5px; color: var(--faint); }
+.reminder-meta > span:first-child { display: inline-flex; align-items: center; gap: 6px; }
+.reminder-meta svg { width: 13px; height: 13px; }
+.reminder-meta .chip svg { width: 12px; height: 12px; }
+.reminder-actions { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.reminder-btns { display: flex; gap: 4px; }
+@media (max-width: 560px) {
+  .reminder { flex-wrap: wrap; }
+  .reminder-actions { flex-direction: row; width: 100%; justify-content: space-between; align-items: center; }
+}
+
+/* ---- company accounts ---------------------------------------------- */
+.company-list { display: flex; flex-direction: column; gap: 20px; }
+.company-card { margin-bottom: 0; }
+.company-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.company-logo { flex: none; width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); }
+.company-logo svg { width: 24px; height: 24px; }
+.company-head h2 { margin-bottom: 0; font-size: 19px; }
+
+.member-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.member-list li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--glass-border); background: color-mix(in srgb, var(--surface) 40%, transparent); }
+.member-ava { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 13px; background: color-mix(in srgb, var(--text) 9%, transparent); color: var(--text); }
+.member-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.member-main b { font-size: 14px; }
+.member-you { color: var(--accent); font-weight: 600; }
+.member-id { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; color: var(--faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.member-add { margin-top: 4px; }
+
+/* ---- bookings ------------------------------------------------------ */
+.booking-list { display: flex; flex-direction: column; gap: 14px; }
+.booking-card { display: flex; gap: 14px; padding: 16px 18px; border-radius: var(--r-lg); }
+.booking-type { flex: none; width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); }
+.booking-type[data-type="Rental"] { background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); }
+.booking-type svg { width: 21px; height: 21px; }
+.booking-main { flex: 1; min-width: 0; }
+.booking-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.booking-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--text); }
+a.booking-title:hover { color: var(--accent); }
+.booking-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; color: var(--dim); font-size: 13px; }
+.booking-meta span { display: inline-flex; align-items: center; gap: 6px; }
+.booking-meta svg { width: 14px; height: 14px; color: var(--faint); }
+.booking-ago { color: var(--faint); }
+.booking-note { margin-top: 10px; font-size: 13.5px; color: var(--dim); line-height: 1.5; }
+.booking-note b { color: var(--text); }
+.booking-reason { color: #b91c1c; }
+[data-theme="dark"] .booking-reason { color: #fca5a5; }
+.booking-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+.booking-panel h3 { display: flex; align-items: center; gap: 9px; font-size: 16px; margin-bottom: 14px; }
+.booking-panel h3 svg { width: 18px; height: 18px; color: var(--accent); }
+.booking-panel .btn-primary { width: 100%; margin-top: 4px; }

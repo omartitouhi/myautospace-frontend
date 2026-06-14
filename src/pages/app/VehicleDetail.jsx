@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useUI } from '../../lib/ui'
 import { useAuth } from '../../lib/auth'
-import { vehicleApi, ApiError } from '../../lib/api'
+import { vehicleApi, bookingApi, ApiError } from '../../lib/api'
 import { Icon } from '../../lib/Icon'
 import { formatDate, formatKm, formatPrice } from '../../lib/format'
-import { Alert, EmptyState, Spinner, StatusChip, VehicleArt } from '../../components/app/ui'
+import { Alert, EmptyState, Field, Spinner, StatusChip, VehicleArt } from '../../components/app/ui'
 
 export function VehicleDetail() {
   const { id } = useParams()
@@ -155,6 +155,8 @@ export function VehicleDetail() {
                 </button>
               </div>
             </div>
+          ) : vehicle.status === 'Active' ? (
+            <BookingPanel vehicle={vehicle} />
           ) : null}
         </div>
       </div>
@@ -176,5 +178,86 @@ export function VehicleDetail() {
         <p className="vdetail-desc">{vehicle.description || a.vehicle.noDescription}</p>
       </section>
     </div>
+  )
+}
+
+/* Lets a non-owner request a test drive (for-sale) or a rental (for-rent). */
+function BookingPanel({ vehicle }) {
+  const { t } = useUI()
+  const v = t.app.vehicle
+  const isRental = vehicle.listingType === 'ForRent'
+  // Default to tomorrow 10:00, formatted for <input type="datetime-local">.
+  const defaultWhen = () => {
+    const d = new Date()
+    d.setDate(d.getDate() + 1)
+    d.setHours(10, 0, 0, 0)
+    const pad = (n) => String(n).padStart(2, '0')
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+  }
+  const [when, setWhen] = useState(defaultWhen)
+  const [days, setDays] = useState(3)
+  const [note, setNote] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState(null)
+  const [sent, setSent] = useState(false)
+
+  const submit = async (e) => {
+    e.preventDefault()
+    setBusy(true)
+    setError(null)
+    try {
+      await bookingApi.create({
+        vehicleId: vehicle.id,
+        serviceType: isRental ? 'Rental' : 'TestDrive',
+        scheduledAt: new Date(when).toISOString(),
+        durationMinutes: isRental ? Math.max(1, Number(days)) * 1440 : 30,
+        note: note.trim() || null,
+      })
+      setSent(true)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (sent) {
+    return (
+      <div className="panel glass">
+        <Alert tone="info">{v.bookingSent}</Alert>
+        <Link className="btn btn-ghost btn-sm" to="/app/bookings">
+          <Icon name="cal" /> {t.app.bookings.mine}
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <form className="panel glass booking-panel" onSubmit={submit}>
+      <h3>
+        <Icon name="cal" /> {isRental ? v.bookRental : v.bookTestDrive}
+      </h3>
+      {error ? <Alert>{error}</Alert> : null}
+      <Field label={v.when}>
+        <input className="input" type="datetime-local" required value={when} onChange={(e) => setWhen(e.target.value)} />
+      </Field>
+      {isRental ? (
+        <Field label={v.days}>
+          <input className="input" type="number" min={1} max={60} required value={days} onChange={(e) => setDays(e.target.value)} />
+        </Field>
+      ) : null}
+      <Field label={v.bookNote} hint={t.app.common.optional}>
+        <textarea
+          className="input"
+          rows={2}
+          placeholder={v.bookNotePlaceholder}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+        />
+      </Field>
+      <button className="btn btn-primary" disabled={busy}>
+        {busy ? v.sending : v.sendRequest}
+      </button>
+    </form>
   )
 }

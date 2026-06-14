@@ -8,6 +8,8 @@ import { VehicleDetail } from './pages/app/VehicleDetail'
 import { Garage } from './pages/app/Garage'
 import { SellForm } from './pages/app/SellForm'
 import { Profile } from './pages/app/Profile'
+import { Company } from './pages/app/Company'
+import { Bookings } from './pages/app/Bookings'
 import { Notifications } from './pages/app/Notifications'
 import { Welcome } from './pages/app/Welcome'
 
@@ -24,6 +26,8 @@ function App() {
         <Route path="sell" element={<SellForm />} />
         <Route path="sell/:id" element={<SellForm />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="company" element={<Company />} />
+        <Route path="bookings" element={<Bookings />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="welcome" element={<Welcome />} />
       </Route>

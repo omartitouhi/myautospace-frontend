@@ -49,6 +49,7 @@ export function AppNav() {
             {a.nav.browse}
           </NavLink>
           {isSeller ? <NavLink to="/app/garage">{a.nav.garage}</NavLink> : null}
+          <NavLink to="/app/bookings">{a.nav.bookings}</NavLink>
           <NavLink to="/app/notifications">{a.nav.notifications}</NavLink>
         </div>
         <div className="appnav-tools">
@@ -87,6 +88,9 @@ export function AppNav() {
                 </div>
                 <NavLink to="/app/profile" role="menuitem" onClick={() => setMenuOpen(false)}>
                   <Icon name="user" /> {a.nav.profile}
+                </NavLink>
+                <NavLink to="/app/company" role="menuitem" onClick={() => setMenuOpen(false)}>
+                  <Icon name="shield" /> {a.nav.company}
                 </NavLink>
                 <button role="menuitem" onClick={handleLogout}>
                   <Icon name="logout" /> {a.nav.signout}
