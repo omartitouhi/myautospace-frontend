@@ -203,3 +203,169 @@ export const reminderApi = {
   update: (id, body) => api(`/notifications/reminders/${id}`, { method: 'PUT', body }),
   remove: (id) => api(`/notifications/reminders/${id}`, { method: 'DELETE' }),
 }
+
+/* ---- ProviderService (service providers / garages) ----------------- */
+export const providerApi = {
+  listActive: () => api('/providers'),
+  get: (id) => api(`/providers/${id}`),
+  getMine: () => api('/providers/my'),
+  create: (body) => api('/providers', { method: 'POST', body }),
+  update: (id, body) => api(`/providers/${id}`, { method: 'PUT', body }),
+  remove: (id) => api(`/providers/${id}`, { method: 'DELETE' }),
+
+  addService: (profileId, body) => api(`/providers/${profileId}/services`, { method: 'POST', body }),
+  updateService: (profileId, serviceId, body) =>
+    api(`/providers/${profileId}/services/${serviceId}`, { method: 'PUT', body }),
+  deleteService: (profileId, serviceId) =>
+    api(`/providers/${profileId}/services/${serviceId}`, { method: 'DELETE' }),
+
+  getAvailability: (profileId) => api(`/providers/${profileId}/availability`),
+  setAvailability: (profileId, body) => api(`/providers/${profileId}/availability`, { method: 'PUT', body }),
+  deleteAvailability: (profileId, availabilityId) =>
+    api(`/providers/${profileId}/availability/${availabilityId}`, { method: 'DELETE' }),
+
+  addGalleryImage: (profileId, body) => api(`/providers/${profileId}/gallery`, { method: 'POST', body }),
+  deleteGalleryImage: (profileId, imageId) =>
+    api(`/providers/${profileId}/gallery/${imageId}`, { method: 'DELETE' }),
+}
+
+/* ---- MessagingService (chat) --------------------------------------- */
+export const messageApi = {
+  conversations: () => api('/messages/conversations'),
+  startConversation: (body) => api('/messages/conversations', { method: 'POST', body }),
+  messages: (conversationId) => api(`/messages/conversations/${conversationId}/messages`),
+  send: (conversationId, body) => api(`/messages/conversations/${conversationId}/messages`, { method: 'POST', body }),
+  markRead: (conversationId) => api(`/messages/conversations/${conversationId}/read`, { method: 'POST' }),
+  report: (messageId, reason) => api(`/messages/${messageId}/report`, { method: 'POST', body: { reason } }),
+}
+
+/* ---- ContractService ----------------------------------------------- */
+export const contractApi = {
+  listMine: () => api('/contracts/my'),
+  get: (id) => api(`/contracts/${id}`),
+  create: (body) => api('/contracts', { method: 'POST', body }),
+  sign: (id, signerName) => api(`/contracts/${id}/sign`, { method: 'POST', body: { signerName } }),
+  archive: (id) => api(`/contracts/${id}/archive`, { method: 'POST' }),
+}
+
+/* ---- ReviewService ------------------------------------------------- */
+export const reviewApi = {
+  forTarget: (targetType, targetId) => api(`/reviews${qs({ targetType, targetId })}`),
+  summary: (targetType, targetId) => api(`/reviews/summary${qs({ targetType, targetId })}`),
+  mine: () => api('/reviews/my'),
+  create: (body) => api('/reviews', { method: 'POST', body }),
+  respond: (id, text) => api(`/reviews/${id}/response`, { method: 'POST', body: { text } }),
+  approve: (id) => api(`/reviews/${id}/approve`, { method: 'POST' }),
+  reject: (id) => api(`/reviews/${id}/reject`, { method: 'POST' }),
+}
+
+/* ---- PaymentService (wallet & payments) ---------------------------- */
+export const paymentApi = {
+  checkout: (body) => api('/payments/checkout', { method: 'POST', body }),
+  listMine: () => api('/payments/my'),
+  get: (id) => api(`/payments/${id}`),
+  refund: (id, reason = null) => api(`/payments/${id}/refund`, { method: 'POST', body: { reason } }),
+  wallet: () => api('/payments/wallet'),
+  topUp: (body) => api('/payments/wallet/topup', { method: 'POST', body }),
+  transactions: () => api('/payments/wallet/transactions'),
+  invoice: (id) => api(`/payments/${id}/invoice`),
+}
+
+/* ---- MediaService (uploads) ---------------------------------------- */
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = () => reject(new Error('Could not read file.'))
+    reader.readAsDataURL(file)
+  })
+}
+
+export const mediaApi = {
+  // Reads a File in the browser, base64-encodes it and uploads it.
+  upload: async (file, { relatedEntityType = null, relatedEntityId = null } = {}) => {
+    const dataBase64 = await fileToDataUrl(file)
+    const kind = file.type?.startsWith('image/') ? 'Image' : 'Document'
+    return api('/media/upload', {
+      method: 'POST',
+      body: {
+        fileName: file.name,
+        contentType: file.type || 'application/octet-stream',
+        dataBase64,
+        kind,
+        relatedEntityType,
+        relatedEntityId,
+      },
+    })
+  },
+  byEntity: (entityId, type) => api(`/media/entity/${entityId}${qs({ type })}`),
+  my: () => api('/media/my'),
+  remove: (id) => api(`/media/${id}`, { method: 'DELETE' }),
+}
+
+/* ---- AdminService (back-office) ------------------------------------ */
+export const adminApi = {
+  users: {
+    list: () => api('/admin/users'),
+    suspend: (id) => api(`/admin/users/${id}/suspend`, { method: 'POST' }),
+    activate: (id) => api(`/admin/users/${id}/activate`, { method: 'POST' }),
+    block: (id) => api(`/admin/users/${id}/block`, { method: 'POST' }),
+  },
+  content: {
+    list: () => api('/admin/content'),
+    approve: (id) => api(`/admin/content/${id}/approve`, { method: 'POST' }),
+    reject: (id) => api(`/admin/content/${id}/reject`, { method: 'POST' }),
+    remove: (id) => api(`/admin/content/${id}/remove`, { method: 'POST' }),
+  },
+  moderation: {
+    list: () => api('/admin/moderation/cases'),
+    create: (body) => api('/admin/moderation/cases', { method: 'POST', body }),
+    assign: (id, body) => api(`/admin/moderation/cases/${id}/assign`, { method: 'POST', body }),
+    approve: (id, body) => api(`/admin/moderation/cases/${id}/approve`, { method: 'POST', body }),
+    reject: (id, body) => api(`/admin/moderation/cases/${id}/reject`, { method: 'POST', body }),
+    resolve: (id, body) => api(`/admin/moderation/cases/${id}/resolve`, { method: 'POST', body }),
+  },
+  payments: {
+    list: () => api('/admin/payments'),
+    stats: () => api('/admin/payments/stats'),
+    requestRefund: (id) => api(`/admin/payments/${id}/refund-request`, { method: 'POST' }),
+  },
+  audit: {
+    list: (params = {}) => api(`/admin/audit${qs(params)}`),
+  },
+  config: {
+    list: () => api('/admin/config'),
+    upsert: (key, body) => api(`/admin/config/${encodeURIComponent(key)}`, { method: 'PUT', body }),
+    remove: (key) => api(`/admin/config/${encodeURIComponent(key)}`, { method: 'DELETE' }),
+  },
+  reports: {
+    list: () => api('/admin/reports'),
+    generate: (body) => api('/admin/reports/generate', { method: 'POST', body }),
+  },
+}
+
+/* ---- MapService (geo locations) ------------------------------------ */
+export const mapApi = {
+  create: (body) => api('/maps/locations', { method: 'POST', body }),
+  get: (id) => api(`/maps/locations/${id}`),
+  getByEntity: (entityId, entityType) =>
+    api(`/maps/locations/entity/${entityId}${qs({ entityType })}`),
+  myLocations: () => api('/maps/locations/my'),
+  nearby: ({ latitude, longitude, radiusKm, entityType, limit }) =>
+    api(`/maps/locations/nearby${qs({ latitude, longitude, radiusKm, entityType, limit })}`),
+  update: (id, body) => api(`/maps/locations/${id}`, { method: 'PUT', body }),
+  remove: (id) => api(`/maps/locations/${id}`, { method: 'DELETE' }),
+
+  // Create-or-update the single location for an entity (vehicle/provider).
+  upsertForEntity: async (entityId, entityType, body) => {
+    try {
+      const existing = await api(`/maps/locations/entity/${entityId}${qs({ entityType })}`)
+      return await api(`/maps/locations/${existing.id}`, { method: 'PUT', body })
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 404) {
+        return api('/maps/locations', { method: 'POST', body: { entityId, entityType, ...body } })
+      }
+      throw err
+    }
+  },
+}

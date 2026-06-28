@@ -34,6 +34,16 @@ export function Garage() {
     return <Alert tone="info">{a.garage.notSeller}</Alert>
   }
 
+  const d = a.dashboard
+  const stats = vehicles
+    ? [
+        ['car', vehicles.filter((v) => v.status === 'Active').length, d.activeListings],
+        ['doc', vehicles.filter((v) => v.status === 'Draft').length, d.drafts],
+        ['check', vehicles.filter((v) => v.status === 'Sold' || v.status === 'Rented').length, d.sold],
+        ['tag', vehicles.length, d.listings],
+      ]
+    : null
+
   return (
     <>
       <PageHead title={a.garage.title} sub={a.garage.sub}>
@@ -41,6 +51,20 @@ export function Garage() {
           <Icon name="plus" /> {a.garage.newListing}
         </Link>
       </PageHead>
+
+      {stats && vehicles.length > 0 ? (
+        <div className="mas-stats">
+          {stats.map(([icon, value, label]) => (
+            <div key={label} className="mas-stat">
+              <div className="mas-stat-ico">
+                <Icon name={icon} />
+              </div>
+              <b>{value}</b>
+              <span>{label}</span>
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       {error ? <Alert>{error}</Alert> : null}
 

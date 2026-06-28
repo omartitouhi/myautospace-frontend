@@ -13,10 +13,12 @@ export function Spinner({ label }) {
   )
 }
 
+const ALERT_ICONS = { error: 'alert', success: 'check', info: 'info' }
+
 export function Alert({ tone = 'error', children }) {
   return (
     <div className="alert" data-tone={tone} role="alert">
-      <Icon name={tone === 'error' ? 'alert' : 'info'} />
+      <Icon name={ALERT_ICONS[tone] ?? 'info'} />
       <div>{children}</div>
     </div>
   )

@@ -6,6 +6,7 @@ import { userApi } from '../../lib/api'
 import { Icon } from '../../lib/Icon'
 import { formatDate, timeAgo } from '../../lib/format'
 import { Alert, Field, PageHead, Select, Spinner, StatusChip, Toggle } from '../../components/app/ui'
+import { UploadButton } from '../../components/app/MediaUpload'
 
 const DOC_TYPES = ['CIN', 'Passport', 'CompanyRegistration', 'TaxDocument']
 const PACKS = ['Free', 'Premium', 'Pro']
@@ -167,6 +168,14 @@ function VerificationPanel({ profile, refreshProfile, onError }) {
               value={docForm.fileUrl}
               onChange={(e) => setDocForm((f) => ({ ...f, fileUrl: e.target.value }))}
             />
+            <div className="upload-row">
+              <UploadButton
+                accept="image/*,application/pdf"
+                relatedEntityType="UserDocument"
+                onUploaded={(asset) => setDocForm((f) => ({ ...f, fileUrl: asset.url }))}
+                onError={onError}
+              />
+            </div>
           </Field>
           <div className="form-actions">
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAdding(false)} disabled={busy}>
@@ -403,6 +412,14 @@ function IdentityPanel({ profile, session, setProfile, onError }) {
         </div>
         <Field label={w.avatarUrl} hint={c.optional}>
           <input className="input" type="url" value={form.profilePictureUrl} onChange={set('profilePictureUrl')} />
+          <div className="upload-row">
+            <UploadButton
+              accept="image/*"
+              relatedEntityType="Avatar"
+              onUploaded={(asset) => setForm((f) => ({ ...f, profilePictureUrl: asset.url }))}
+              onError={onError}
+            />
+          </div>
         </Field>
         <Field label={w.bio} hint={c.optional}>
           <textarea className="input" rows={3} value={form.bio} onChange={set('bio')} />

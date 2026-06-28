@@ -1,0 +1,16 @@
+{
+  "pkg": "myautospace-frontend",
+  "projectId": "28565c40-9937-4343-9e36-c943a3a9263a",
+  "globalName": "MyAutoSpaceDS",
+  "shape": "package",
+  "srcDir": "src/components/app",
+  "cssEntry": "src/index.css",
+  "tokensGlob": [".design-sync/ds-fonts.css"],
+  "runtimeFontPrefixes": ["Bricolage Grotesque", "Hanken Grotesk", "Plus Jakarta Sans", "Sora"],
+  "extraEntries": ["./.design-sync/preview-provider.jsx", "./.design-sync/ds-extras.jsx"],
+  "provider": { "component": "DesignPreviewProvider" },
+  "overrides": {
+    "VehicleCard": { "cardMode": "column" }
+  },
+  "readmeHeader": ".design-sync/conventions.md"
+}

@@ -44,6 +44,24 @@ export function Bookings() {
       <PageHead title={b.title} sub={b.sub} />
       {tabs.length > 1 ? <Segmented value={tab} onChange={setTab} options={tabs} ariaLabel={b.title} /> : null}
 
+      {items && items.length > 0 ? (
+        <div className="mas-stats">
+          {[
+            ['clock', items.filter((x) => x.status === 'Pending').length, b.statuses.Pending],
+            ['check', items.filter((x) => x.status === 'Confirmed').length, b.statuses.Confirmed],
+            ['shieldCheck', items.filter((x) => x.status === 'Completed').length, b.statuses.Completed],
+          ].map(([icon, value, label]) => (
+            <div key={label} className="mas-stat">
+              <div className="mas-stat-ico">
+                <Icon name={icon} />
+              </div>
+              <b>{value}</b>
+              <span>{label}</span>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
       {error ? <Alert>{error}</Alert> : null}
 
       {!items && !error ? (

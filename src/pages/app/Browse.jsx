@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useUI } from '../../lib/ui'
-import { vehicleApi, searchApi } from '../../lib/api'
+import { vehicleApi, searchApi, mapApi } from '../../lib/api'
+import { getCurrentPosition } from '../../lib/geo'
 import { Icon } from '../../lib/Icon'
 import { VehicleCard } from '../../components/app/VehicleCard'
-import { Alert, EmptyState, PageHead, Select, Spinner } from '../../components/app/ui'
+import { Alert, EmptyState, Segmented, Select, Spinner } from '../../components/app/ui'
 
 const FUELS = ['Petrol', 'Diesel', 'Electric', 'Hybrid', 'LPG']
 const TRANSMISSIONS = ['Manual', 'Automatic', 'SemiAutomatic']
@@ -27,6 +29,33 @@ export function Browse() {
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [sort, setSort] = useState('newest')
   const searchRef = useRef(null)
+  // 'off' | 'loading' | 'on' | 'error' — "near me" geo filter.
+  const [nearMode, setNearMode] = useState('off')
+  const [nearIds, setNearIds] = useState(null)
+
+  const toggleNear = async () => {
+    if (nearMode === 'on' || nearMode === 'error') {
+      setNearMode('off')
+      setNearIds(null)
+      return
+    }
+    setNearMode('loading')
+    try {
+      const pos = await getCurrentPosition()
+      const results = await mapApi.nearby({
+        latitude: pos.latitude,
+        longitude: pos.longitude,
+        radiusKm: 50,
+        entityType: 'Vehicle',
+        limit: 100,
+      })
+      setNearIds(new Set(results.map((r) => r.entityId)))
+      setNearMode('on')
+    } catch {
+      setNearIds(null)
+      setNearMode('error')
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -125,6 +154,8 @@ export function Browse() {
       }
     }
 
+    if (nearMode === 'on' && nearIds) list = list.filter((v) => nearIds.has(v.id))
+
     if (filters.fuel) list = list.filter((v) => v.fuelType === filters.fuel)
     if (filters.transmission) list = list.filter((v) => v.transmission === filters.transmission)
     if (filters.body) list = list.filter((v) => v.bodyType === filters.body)
@@ -142,7 +173,7 @@ export function Browse() {
       list = [...list].sort((x, y) => y.price - x.price)
     }
     return list
-  }, [vehicles, activeQuery, searchRank, filters, sort])
+  }, [vehicles, activeQuery, searchRank, filters, sort, nearMode, nearIds])
 
   const hasActiveFilters =
     activeQuery || Object.values(filters).some((v) => v !== '')
@@ -156,119 +187,168 @@ export function Browse() {
 
   return (
     <>
-      <PageHead title={a.browse.title} sub={a.browse.sub} />
+      <section className="mas-hero">
+        <span className="eyebrow">
+          <span className="dot" /> {a.browse.title}
+        </span>
+        <h1>{a.browse.title}</h1>
+        <p>{a.browse.sub}</p>
+      </section>
 
-      <div className="browse-bar glass">
-        <form
-          className="browse-search"
-          onSubmit={(e) => {
-            e.preventDefault()
-            runSearch(query)
-          }}
-        >
-          <Icon name="search" />
-          <input
-            ref={searchRef}
-            type="search"
-            placeholder={a.browse.searchPlaceholder}
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value)
-              setSugsOpen(true)
-            }}
-            onFocus={() => setSugsOpen(true)}
-            onBlur={() => setSugsOpen(false)}
-          />
-          {activeQuery ? (
-            <button type="button" className="browse-clear" onClick={clearSearch} aria-label={t.app.common.reset}>
-              <Icon name="x" />
-            </button>
-          ) : null}
-          {sugsOpen && suggestions.length > 0 ? (
-            <ul className="sugs glass">
-              {suggestions.map((s) => (
-                <li key={s}>
-                  {/* mousedown beats the input blur */}
-                  <button
-                    type="button"
-                    onMouseDown={(e) => {
-                      e.preventDefault()
-                      setQuery(s)
-                      runSearch(s)
-                    }}
-                  >
-                    <Icon name="search" /> {s}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </form>
+      <div className="mas-browse">
+        <aside className="mas-rail">
+          <div className="mas-rail-box glass">
+            <p className="mas-rail-h">{a.browse.listingType}</p>
+            <Segmented
+              ariaLabel={a.browse.listingType}
+              value={filters.listing}
+              onChange={(val) => setFilters((f) => ({ ...f, listing: val }))}
+              options={[['', a.browse.anyListing], ...LISTINGS.map((v) => [v, a.enums.listing[v]])]}
+            />
+          </div>
 
-        <div className="browse-filters">
-          <Select value={filters.listing} onChange={setFilter('listing')} aria-label={a.sell.listingType}
-            options={[['', a.browse.anyListing], ...LISTINGS.map((v) => [v, a.enums.listing[v]])]} />
-          <Select value={filters.fuel} onChange={setFilter('fuel')} aria-label={a.sell.fuel}
-            options={[['', a.browse.anyFuel], ...FUELS.map((v) => [v, a.enums.fuel[v]])]} />
-          <Select value={filters.transmission} onChange={setFilter('transmission')} aria-label={a.sell.transmission}
-            options={[['', a.browse.anyTransmission], ...TRANSMISSIONS.map((v) => [v, a.enums.transmission[v]])]} />
-          <Select value={filters.body} onChange={setFilter('body')} aria-label={a.sell.body}
-            options={[['', a.browse.anyBody], ...BODIES.map((v) => [v, a.enums.body[v]])]} />
-          <input
-            className="input input-num"
-            type="number"
-            min="0"
-            placeholder={a.browse.minPrice}
-            value={filters.minPrice}
-            onChange={setFilter('minPrice')}
-          />
-          <input
-            className="input input-num"
-            type="number"
-            min="0"
-            placeholder={a.browse.maxPrice}
-            value={filters.maxPrice}
-            onChange={setFilter('maxPrice')}
-          />
-          <Select value={sort} onChange={(e) => setSort(e.target.value)} aria-label={a.browse.sort} options={sortOptions} />
-        </div>
-      </div>
-
-      {searchNote ? <Alert tone="info">{searchNote}</Alert> : null}
-      {loadError ? (
-        <Alert>
-          {a.browse.loadFailed} {loadError}
-        </Alert>
-      ) : null}
-
-      {!vehicles && !loadError ? (
-        <Spinner label={a.common.loading} />
-      ) : vehicles ? (
-        <>
-          <p className="browse-count">{a.browse.results(visible.length)}</p>
-          {visible.length === 0 ? (
-            <EmptyState title={a.browse.empty} hint={a.browse.emptyHint}>
+          <div className="mas-rail-box glass">
+            <p className="mas-rail-h">{a.browse.filtersTitle}</p>
+            <div className="mas-rail-group">
+              <Select value={filters.fuel} onChange={setFilter('fuel')} aria-label={a.sell.fuel}
+                options={[['', a.browse.anyFuel], ...FUELS.map((v) => [v, a.enums.fuel[v]])]} />
+              <Select value={filters.transmission} onChange={setFilter('transmission')} aria-label={a.sell.transmission}
+                options={[['', a.browse.anyTransmission], ...TRANSMISSIONS.map((v) => [v, a.enums.transmission[v]])]} />
+              <Select value={filters.body} onChange={setFilter('body')} aria-label={a.sell.body}
+                options={[['', a.browse.anyBody], ...BODIES.map((v) => [v, a.enums.body[v]])]} />
+              <div className="field-row">
+                <input className="input" type="number" min="0" placeholder={a.browse.minPrice}
+                  value={filters.minPrice} onChange={setFilter('minPrice')} />
+                <input className="input" type="number" min="0" placeholder={a.browse.maxPrice}
+                  value={filters.maxPrice} onChange={setFilter('maxPrice')} />
+              </div>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm near-btn"
+                data-on={nearMode === 'on' ? '1' : '0'}
+                onClick={toggleNear}
+                disabled={nearMode === 'loading'}
+              >
+                <Icon name="pin" />
+                {nearMode === 'loading' ? a.browse.locating : nearMode === 'on' ? a.browse.nearMeActive : a.browse.nearMe}
+              </button>
               {hasActiveFilters ? (
                 <button
-                  className="btn btn-ghost"
+                  type="button"
+                  className="btn btn-ghost btn-sm"
                   onClick={() => {
                     clearSearch()
                     setFilters(EMPTY_FILTERS)
                   }}
                 >
-                  {a.common.reset}
+                  <Icon name="refresh" /> {a.common.reset}
                 </button>
               ) : null}
-            </EmptyState>
-          ) : (
-            <div className="cards-grid">
-              {visible.map((v) => (
-                <VehicleCard key={v.id} vehicle={v} />
-              ))}
             </div>
-          )}
-        </>
-      ) : null}
+          </div>
+
+          <div className="mas-promo">
+            <div className="mas-promo-ico">
+              <Icon name="bolt" />
+            </div>
+            <b>{a.browse.promoTitle}</b>
+            <p>{a.browse.promoText}</p>
+            <Link to="/app/sell" className="btn btn-primary btn-sm" style={{ marginTop: 12 }}>
+              <Icon name="plus" /> {a.browse.promoCta}
+            </Link>
+          </div>
+        </aside>
+
+        <div className="mas-results">
+          <div className="browse-bar glass">
+            <form
+              className="browse-search"
+              onSubmit={(e) => {
+                e.preventDefault()
+                runSearch(query)
+              }}
+            >
+              <Icon name="search" />
+              <input
+                ref={searchRef}
+                type="search"
+                placeholder={a.browse.searchPlaceholder}
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value)
+                  setSugsOpen(true)
+                }}
+                onFocus={() => setSugsOpen(true)}
+                onBlur={() => setSugsOpen(false)}
+              />
+              {activeQuery ? (
+                <button type="button" className="browse-clear" onClick={clearSearch} aria-label={t.app.common.reset}>
+                  <Icon name="x" />
+                </button>
+              ) : null}
+              {sugsOpen && suggestions.length > 0 ? (
+                <ul className="sugs glass">
+                  {suggestions.map((s) => (
+                    <li key={s}>
+                      {/* mousedown beats the input blur */}
+                      <button
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault()
+                          setQuery(s)
+                          runSearch(s)
+                        }}
+                      >
+                        <Icon name="search" /> {s}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </form>
+          </div>
+
+          {nearMode === 'error' ? <Alert tone="info">{a.browse.geoError}</Alert> : null}
+          {searchNote ? <Alert tone="info">{searchNote}</Alert> : null}
+          {loadError ? (
+            <Alert>
+              {a.browse.loadFailed} {loadError}
+            </Alert>
+          ) : null}
+
+          {!vehicles && !loadError ? (
+            <Spinner label={a.common.loading} />
+          ) : vehicles ? (
+            <>
+              <div className="mas-results-head">
+                <p className="browse-count">{a.browse.results(visible.length)}</p>
+                <Select value={sort} onChange={(e) => setSort(e.target.value)} aria-label={a.browse.sort} options={sortOptions} />
+              </div>
+              {visible.length === 0 ? (
+                <EmptyState title={a.browse.empty} hint={a.browse.emptyHint}>
+                  {hasActiveFilters ? (
+                    <button
+                      className="btn btn-ghost"
+                      onClick={() => {
+                        clearSearch()
+                        setFilters(EMPTY_FILTERS)
+                      }}
+                    >
+                      {a.common.reset}
+                    </button>
+                  ) : null}
+                </EmptyState>
+              ) : (
+                <div className="cards-grid">
+                  {visible.map((v) => (
+                    <VehicleCard key={v.id} vehicle={v} />
+                  ))}
+                </div>
+              )}
+            </>
+          ) : null}
+        </div>
+      </div>
     </>
   )
 }

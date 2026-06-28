@@ -3,7 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useUI } from '../../lib/ui'
 import { useAuth } from '../../lib/auth'
 import { vehicleApi } from '../../lib/api'
+import { Icon } from '../../lib/Icon'
 import { Alert, Field, PageHead, Segmented, Select, Spinner } from '../../components/app/ui'
+import { VehicleCard } from '../../components/app/VehicleCard'
+import { LocationPanel } from '../../components/app/LocationPanel'
+import { EntityGallery } from '../../components/app/MediaUpload'
 
 const FUELS = ['Petrol', 'Diesel', 'Electric', 'Hybrid', 'LPG']
 const TRANSMISSIONS = ['Manual', 'Automatic', 'SemiAutomatic']
@@ -114,14 +118,42 @@ export function SellForm() {
     }
   }
 
+  // Live-preview vehicle built from the current form values.
+  const previewVehicle = {
+    id: 'preview',
+    make: form.make || a.sell.make,
+    model: form.model || a.sell.model,
+    price: Number(form.price) || 0,
+    year: Number(form.year) || new Date().getFullYear(),
+    mileage: Number(form.mileage) || 0,
+    fuelType: form.fuelType,
+    transmission: form.transmission,
+    bodyType: form.bodyType,
+    color: form.color,
+    city: form.city || '—',
+    country: form.country,
+    listingType: form.listingType,
+    status: 'Active',
+    imageUrls: [],
+  }
+  const checklist = [
+    [`${a.sell.make} & ${a.sell.model}`, !!(form.make && form.model)],
+    [a.sell.price, !!form.price],
+    [a.sell.mileage, !!form.mileage],
+    [a.sell.city, !!form.city],
+    [a.sell.description, !!form.description],
+  ]
+
   return (
-    <div className="page-narrow">
+    <>
       <PageHead
         title={isEdit ? a.sell.editTitle : a.sell.createTitle}
         sub={isEdit ? a.sell.editSub : a.sell.createSub}
       />
       {error ? <Alert>{error}</Alert> : null}
 
+      <div className="mas-sell">
+        <div className="mas-sell-form">
       <form className="panel glass" onSubmit={onSubmit}>
         <h3 className="form-section">{a.sell.vehicleSection}</h3>
         <div className="field-row">
@@ -213,6 +245,39 @@ export function SellForm() {
           {busy ? a.sell.submittingCreate : isEdit ? a.sell.submitSave : a.sell.submitCreate}
         </button>
       </form>
-    </div>
+
+      {isEdit ? (
+        <>
+          <section className="panel glass">
+            <h2 className="panel-sub">{a.media.photos}</h2>
+            <EntityGallery entityType="Vehicle" entityId={id} />
+          </section>
+          <LocationPanel entityId={id} entityType="Vehicle" defaultCity={form.city} defaultCountry={form.country} />
+        </>
+      ) : null}
+        </div>
+
+        <aside className="mas-sell-aside">
+          <section className="panel glass">
+            <h2 className="panel-sub">{a.sell.preview}</h2>
+            <VehicleCard vehicle={previewVehicle} />
+          </section>
+          <section className="panel glass">
+            <h2 className="panel-sub">{a.sell.checklist}</h2>
+            <p className="profile-meta" style={{ marginBottom: 10 }}>{a.sell.checklistHint}</p>
+            <ul className="mas-checklist">
+              {checklist.map(([label, done]) => (
+                <li key={label} data-done={done ? '1' : '0'}>
+                  <span className="tick">
+                    <Icon name="check" />
+                  </span>
+                  {label}
+                </li>
+              ))}
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </>
   )
 }

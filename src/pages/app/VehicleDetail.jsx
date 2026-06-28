@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useUI } from '../../lib/ui'
 import { useAuth } from '../../lib/auth'
-import { vehicleApi, bookingApi, ApiError } from '../../lib/api'
+import { vehicleApi, bookingApi, mediaApi, ApiError } from '../../lib/api'
 import { Icon } from '../../lib/Icon'
 import { formatDate, formatKm, formatPrice } from '../../lib/format'
 import { Alert, EmptyState, Field, Spinner, StatusChip, VehicleArt } from '../../components/app/ui'
+import { ReviewsSection } from '../../components/app/ReviewsSection'
+import { ContactButton } from '../../components/app/ContactButton'
 
 export function VehicleDetail() {
   const { id } = useParams()
@@ -14,9 +16,11 @@ export function VehicleDetail() {
   const navigate = useNavigate()
   const a = t.app
   const [vehicle, setVehicle] = useState(null)
+  const [gallery, setGallery] = useState([])
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState(null)
   const [busy, setBusy] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -35,10 +39,26 @@ export function VehicleDetail() {
     }
   }, [id])
 
+  // Gallery is best-effort — MediaService may be unavailable.
+  useEffect(() => {
+    let cancelled = false
+    mediaApi
+      .byEntity(id, 'Vehicle')
+      .then((data) => {
+        if (!cancelled) setGallery(data)
+      })
+      .catch(() => {
+        if (!cancelled) setGallery([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [id])
+
   if (notFound) {
     return (
       <EmptyState title={a.vehicle.notFound}>
-        <Link className="btn btn-ghost" to="/app">
+        <Link className="btn btn-ghost" to="/app/browse">
           {a.vehicle.backToBrowse}
         </Link>
       </EmptyState>
@@ -76,6 +96,17 @@ export function VehicleDetail() {
     }
   }
 
+  // Canonical imageUrls first, then any extra MediaService uploads (deduped).
+  const images = [...new Set([...(vehicle.imageUrls ?? []), ...gallery.map((g) => g.url)])]
+  const activeImage = images[Math.min(activeIndex, images.length - 1)]
+
+  const highlights = [
+    ['cal', vehicle.year],
+    ['gauge', formatKm(vehicle.mileage, lang)],
+    ['fuel', a.enums.fuel[vehicle.fuelType] ?? vehicle.fuelType],
+    ['cog', a.enums.transmission[vehicle.transmission] ?? vehicle.transmission],
+  ]
+
   const specs = [
     [a.vehicle.year, vehicle.year],
     [a.vehicle.mileage, formatKm(vehicle.mileage, lang)],
@@ -90,19 +121,73 @@ export function VehicleDetail() {
   ]
 
   return (
-    <div className="vdetail">
-      <Link to="/app" className="back-link">
+    <div className="vw">
+      <Link to="/app/browse" className="back-link">
         <Icon name="arrow" style={{ transform: 'rotate(180deg)' }} /> {a.vehicle.backToBrowse}
       </Link>
 
       {error ? <Alert>{error}</Alert> : null}
 
-      <div className="vdetail-grid">
-        <div className="vdetail-media glass-card">
-          <VehicleArt vehicle={vehicle} />
+      <div className="vw-grid">
+        {/* col 1 — gallery + at-a-glance */}
+        <div className="vw-col">
+          <div className="vw-media glass-card">
+            {images.length > 0 ? (
+              <img className="vdetail-photo" src={activeImage} alt={`${vehicle.make} ${vehicle.model}`} />
+            ) : (
+              <VehicleArt vehicle={vehicle} />
+            )}
+          </div>
+          {images.length > 1 ? (
+            <div className="vw-thumbs">
+              {images.map((url, i) => (
+                <img
+                  key={url}
+                  src={url}
+                  alt=""
+                  loading="lazy"
+                  data-on={i === Math.min(activeIndex, images.length - 1) ? '1' : '0'}
+                  onClick={() => setActiveIndex(i)}
+                />
+              ))}
+            </div>
+          ) : null}
+          <section className="panel glass vw-glance">
+            <h2 className="panel-sub">{a.vehicle.glance}</h2>
+            <div className="vdetail-highlights">
+              {highlights.map(([icon, value]) => (
+                <span key={icon} className="vdetail-hl">
+                  <Icon name={icon} /> {value}
+                </span>
+              ))}
+            </div>
+          </section>
         </div>
 
-        <div className="vdetail-side">
+        {/* col 2 — specs, description, reviews */}
+        <div className="vw-col">
+          <section className="panel glass">
+            <h2>{a.vehicle.specs}</h2>
+            <dl className="spec-grid">
+              {specs.map(([label, value]) => (
+                <div key={label} className="spec">
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+
+          <section className="panel glass">
+            <h2>{a.vehicle.description}</h2>
+            <p className="vdetail-desc">{vehicle.description || a.vehicle.noDescription}</p>
+          </section>
+
+          <ReviewsSection targetType="Vehicle" targetId={vehicle.id} />
+        </div>
+
+        {/* col 3 — sticky buy rail */}
+        <div className="vw-buy">
           <div className="panel glass">
             <div className="vdetail-chips">
               <StatusChip
@@ -115,7 +200,10 @@ export function VehicleDetail() {
               {vehicle.make} {vehicle.model}
               <span className="vdetail-year">{vehicle.year}</span>
             </h1>
-            <div className="vdetail-price">{formatPrice(vehicle.price, lang)}</div>
+            <div className="vdetail-price">
+              {formatPrice(vehicle.price, lang)}
+              {vehicle.listingType === 'ForRent' ? <span className="vdetail-per"> {a.vehicle.perDay}</span> : null}
+            </div>
             <div className="vdetail-loc">
               <Icon name="pin" /> {vehicle.city}, {vehicle.country}
             </div>
@@ -155,28 +243,14 @@ export function VehicleDetail() {
                 </button>
               </div>
             </div>
-          ) : vehicle.status === 'Active' ? (
-            <BookingPanel vehicle={vehicle} />
-          ) : null}
+          ) : (
+            <>
+              {vehicle.status === 'Active' ? <BookingPanel vehicle={vehicle} /> : null}
+              <ContactButton otherUserId={vehicle.ownerAuthUserId} vehicleId={vehicle.id} label={a.messages.contactSeller} />
+            </>
+          )}
         </div>
       </div>
-
-      <section className="panel glass">
-        <h2>{a.vehicle.specs}</h2>
-        <dl className="spec-grid">
-          {specs.map(([label, value]) => (
-            <div key={label} className="spec">
-              <dt>{label}</dt>
-              <dd>{value}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-
-      <section className="panel glass">
-        <h2>{a.vehicle.description}</h2>
-        <p className="vdetail-desc">{vehicle.description || a.vehicle.noDescription}</p>
-      </section>
     </div>
   )
 }

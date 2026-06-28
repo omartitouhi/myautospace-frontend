@@ -73,8 +73,10 @@ export function AuthProvider({ children }) {
       profileStatus,
       isAuthenticated: !!session,
       roles: session?.roles ?? [],
+      isBuyer: (session?.roles ?? []).includes('Buyer'),
       isSeller: (session?.roles ?? []).includes('Seller'),
       isAdmin: (session?.roles ?? []).includes('Admin'),
+      isServiceProvider: (session?.roles ?? []).includes('ServiceProvider'),
 
       login: async (email, password) => {
         const data = await authApi.login({ email, password })

@@ -7,7 +7,7 @@ import { Brand } from '../Brand'
 
 export function AppNav() {
   const { t, theme, toggleTheme, toggleLang } = useUI()
-  const { profile, session, isSeller, logout } = useAuth()
+  const { profile, session, isSeller, isServiceProvider, isAdmin, logout } = useAuth()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
@@ -46,10 +46,14 @@ export function AppNav() {
         <Brand />
         <div className="appnav-links">
           <NavLink to="/app" end>
-            {a.nav.browse}
+            {a.nav.dashboard}
           </NavLink>
+          <NavLink to="/app/browse">{a.nav.browse}</NavLink>
           {isSeller ? <NavLink to="/app/garage">{a.nav.garage}</NavLink> : null}
+          <NavLink to="/app/providers">{a.nav.services}</NavLink>
+          {isServiceProvider ? <NavLink to="/app/provider">{a.nav.myServices}</NavLink> : null}
           <NavLink to="/app/bookings">{a.nav.bookings}</NavLink>
+          <NavLink to="/app/messages">{a.nav.messages}</NavLink>
           <NavLink to="/app/notifications">{a.nav.notifications}</NavLink>
         </div>
         <div className="appnav-tools">
@@ -92,6 +96,17 @@ export function AppNav() {
                 <NavLink to="/app/company" role="menuitem" onClick={() => setMenuOpen(false)}>
                   <Icon name="shield" /> {a.nav.company}
                 </NavLink>
+                <NavLink to="/app/wallet" role="menuitem" onClick={() => setMenuOpen(false)}>
+                  <Icon name="card" /> {a.nav.wallet}
+                </NavLink>
+                <NavLink to="/app/contracts" role="menuitem" onClick={() => setMenuOpen(false)}>
+                  <Icon name="doc" /> {a.nav.contracts}
+                </NavLink>
+                {isAdmin ? (
+                  <NavLink to="/app/admin" role="menuitem" onClick={() => setMenuOpen(false)}>
+                    <Icon name="cog" /> {a.nav.admin}
+                  </NavLink>
+                ) : null}
                 <button role="menuitem" onClick={handleLogout}>
                   <Icon name="logout" /> {a.nav.signout}
                 </button>

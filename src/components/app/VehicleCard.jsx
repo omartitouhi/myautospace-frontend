@@ -13,7 +13,11 @@ export function VehicleCard({ vehicle, showStatus = false }) {
   return (
     <Link to={`/app/vehicles/${vehicle.id}`} className="vcard glass-card">
       <div className="vcard-media">
-        <VehicleArt vehicle={vehicle} />
+        {vehicle.imageUrls && vehicle.imageUrls.length > 0 ? (
+          <img className="vcard-photo" src={vehicle.imageUrls[0]} alt={`${vehicle.make} ${vehicle.model}`} loading="lazy" />
+        ) : (
+          <VehicleArt vehicle={vehicle} />
+        )}
         <span className="vcard-badge">
           <Icon name="tag" /> {a.enums.listing[vehicle.listingType] ?? vehicle.listingType}
         </span>
